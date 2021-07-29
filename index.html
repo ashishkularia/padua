@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html class="h-100" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="Ashish Kumar" name="author">
+    <title>Padua | Application for Software Developer</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body class="d-flex h-100 text-center bg-dark">
+<div class="d-flex w-100 h-100 p-3 mx-auto flex-column">
+    <header class="mb-auto"></header>
+    <div class="container my-5">
+        <div class="row p-5 align-items-center rounded-3 bg-light border shadow-lg">
+            <div class="overflow-hidden" style="max-height: 30vh;">
+                <div class="container px-5">
+                    <img alt="Example image" class="img-fluid mb-4" height="500" loading="lazy" src="img/padua_logo.png"
+                         width="700">
+                </div>
+            </div>
+            <h1 class="display-5 fw-bold">CSV Object Importer Task</h1>
+            <div class="col-lg-7 mx-auto">
+                <p class="fs-5 mb-4 text-start text-wrap">A small PHP powered tool which can take a CSV file as an
+                    input, parse the columns
+                    and rows into an object, sort the objects, ensure the Transaction Code is valid and then return the
+                    objects in a table format.</p>
+                <div class="d-block gap-2 d-sm-flex justify-content-sm-center">
+                    <form action="csv_object.php" enctype="multipart/form-data" id="convert_csv" method="post">
+                        <fieldset>
+                            <div class="input-group">
+                                <input accept=".csv" aria-describedby="CSVFile" aria-label="Convert" class="form-control" id="csv_file" name="csv_file" required type="file">
+                                <button class="btn btn-outline-info btn-sm px-4 me-sm-3 fw-bold" id="btn_submit"
+                                        type="submit">
+                                    Convert
+                                </button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+            <div class="my-3" id="response_status"></div>
+            <div class="my-3" id="csv_data"></div>
+        </div>
+    </div>
+    <footer class="footer mt-auto py-3 text-white-50">
+        <div class="container">
+            <p>All product and company names are trademarks™ or registered® trademarks of their respective holders. Use
+                of them does not imply any affiliation with or endorsement by them.</p>
+        </div>
+    </footer>
+</div>
+</body>
+<script src="js/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $("form#convert_csv").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            type: $(this).attr("method"),
+            url: $(this).attr("action"),
+            enctype: $(this).attr("enctype"),
+            data: new FormData(this),
+            processData: false,
+            contentType: false,
+            cache: false,
+            dataType: 'json',
+            beforeSend: function () {
+                $("form#convert_csv > fieldset").attr("disabled", "disabled");
+                $("#response_status").html('<div class="spinner-border" role="status"></div>');
+            },
+            success: function (response) {
+                console.log(response);
+                if (response.status === 1) {
+                    $("#response_status").hide().html('<div class="alert alert-success alert-dismissible fade show" role="alert">' + response.message + '</div>').fadeIn('slow').delay(5000).slideUp('slow');
+                    $("form#convert_csv").trigger("reset");
+                    $("#csv_data").hide().html(response.data).slideDown(800);
+                }
+                if (response.status === 0) {
+                    $("#response_status").hide().html('<div class="alert alert-warning alert-dismissible fade show" role="alert">' + response.message + '</div>').slideDown(500).delay(5000).slideUp('slow');
+                }
+                $("form#convert_csv > fieldset").removeAttr("disabled");
+            }
+        });
+    });
+</script>
+</html>
